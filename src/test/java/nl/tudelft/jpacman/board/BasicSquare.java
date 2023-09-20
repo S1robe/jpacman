@@ -16,6 +16,8 @@ class BasicSquare extends Square {
         super();
     }
 
+
+
     @Override
     public boolean isAccessibleTo(Unit unit) {
         return true;
