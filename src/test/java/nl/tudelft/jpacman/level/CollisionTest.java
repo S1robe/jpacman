@@ -38,7 +38,8 @@ public class CollisionTest {
 
     /**
      *
-     * These are bulky loads
+     * These are bulky loads so we load them first for efficiency.
+     * This doesnt affect the state of the tests as these dont need to be refreshed between tests.
      *
      */
     @BeforeAll
