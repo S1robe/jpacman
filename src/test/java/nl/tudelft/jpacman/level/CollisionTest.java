@@ -1,13 +1,13 @@
 package nl.tudelft.jpacman.level;
 
-import nl.tudelft.jpacman.Launcher;
 import nl.tudelft.jpacman.board.BoardFactory;
 import nl.tudelft.jpacman.board.Direction;
 import nl.tudelft.jpacman.board.Square;
+import nl.tudelft.jpacman.game.Game;
+import nl.tudelft.jpacman.game.GameFactory;
 import nl.tudelft.jpacman.npc.Ghost;
 import nl.tudelft.jpacman.npc.ghost.GhostFactory;
 import nl.tudelft.jpacman.points.DefaultPointCalculator;
-import nl.tudelft.jpacman.points.PointCalculator;
 import nl.tudelft.jpacman.points.PointCalculatorLoader;
 import nl.tudelft.jpacman.sprite.PacManSprites;
 import org.assertj.core.api.Assertions;
@@ -16,8 +16,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -26,36 +25,58 @@ public class CollisionTest {
 
     //Crash test dummy time.
 
-    Launcher launcher;
+    static PacManSprites pacManSprites;
+    static GhostFactory ghostFactory;
+    static CustomLevelFactory levelFactory;
+    static GameFactory gameFactory;
+    static MapParser mapParser;
+
+    static Game game;
+    static Level customLevel;
+
     Player pacman;
+
+    /**
+     *
+     * These are bulky loads
+     *
+     */
+    @BeforeAll
+    static void init(){
+        pacManSprites = new PacManSprites();
+        ghostFactory = new GhostFactory(pacManSprites);
+        levelFactory = new CustomLevelFactory(pacManSprites, ghostFactory, new PointCalculatorLoader().load());
+        gameFactory = new GameFactory(new PlayerFactory(pacManSprites));
+        mapParser = new MapParser(levelFactory, new BoardFactory(pacManSprites));
+        try {
+            customLevel = mapParser.parseMap("/collisionMap.txt");
+        } catch (IOException e) {
+            Assertions.fail("Map Parser failed to load collisionMap.txt");
+        }
+        game = gameFactory.createSinglePlayerGame(customLevel, new DefaultPointCalculator());
+    }
 
     @BeforeEach
     void setup(){
-        launcher = new Launcher().withMapFile("/collisionMap.txt");
-        launcher.launch();
-        launcher.getGame().start();
-        pacman = launcher.getGame().getPlayers().get(0);
-        DefaultPlayerInteractionMap x = new DefaultPlayerInteractionMap(new PointCalculatorLoader().load());
-        launcher.getGame().getLevel().addObserver();
+        pacman = game.getPlayers().get(0);
+        game.start();
     }
 
     @Test
     void collideCoinThenWallThenGhost(){
-        Level l = new Level()
-        Level l = launcher.getGame().getLevel();
-        l.move(pacman, Direction.WEST); // Should collide with coin
+        customLevel.move(pacman, Direction.WEST); // Should collide with coin
         // Check for things that do coin things
         Assertions.assertThat(pacman.getScore()).isEqualTo(10); // coins add 10 to score.
 
         Square wall = pacman.squaresAheadOf(1);
-        l.move(pacman, Direction.WEST);
+        customLevel.move(pacman, Direction.WEST);
         Assertions.assertThat(pacman.squaresAheadOf(1)).isEqualTo(wall); // Square should be the same, it is unchanged.
 
         //continue marching right, to the ghost,
         ScheduledExecutorService timer = Executors.newScheduledThreadPool(1);
         timer.scheduleAtFixedRate(() -> {
             if (pacman.isAlive()){
-                l.move(pacman, Direction.EAST);
+                customLevel.move(pacman, Direction.EAST);
             } else {
                 timer.shutdown();
             }
@@ -73,9 +94,8 @@ public class CollisionTest {
 
     @AfterEach
     void tearDown(){
-        if(launcher.getGame().isInProgress())
-            launcher.getGame().stop();
-        launcher.dispose();
+        if(game.isInProgress())
+            game.stop();
     }
 
 
