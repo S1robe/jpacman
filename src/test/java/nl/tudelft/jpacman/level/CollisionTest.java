@@ -65,15 +65,17 @@ public class CollisionTest {
 
     @Test
     void collideCoinThenWallThenGhost(){
-        customLevel.move(pacman, Direction.WEST); // Should collide with coin
-        // Check for things that do coin things
-        Assertions.assertThat(pacman.getScore()).isEqualTo(10); // coins add 10 to score.
+ // Should collide with coin
+        customLevel.move(pacman, Direction.WEST);
+// coins add 10 to score, since this is the first one, score should be 10
+        Assertions.assertThat(pacman.getScore()).isEqualTo(10);
 
         Square wall = pacman.squaresAheadOf(1);
         customLevel.move(pacman, Direction.WEST);
-        Assertions.assertThat(pacman.squaresAheadOf(1)).isEqualTo(wall); // Square should be the same, it is unchanged.
+ // Square should be the same, it is unchanged.
+        Assertions.assertThat(pacman.squaresAheadOf(1)).isEqualTo(wall);
 
-        //continue marching right, to the ghost,
+//continue marching right, to the ghost,
         ScheduledExecutorService timer = Executors.newScheduledThreadPool(1);
         timer.scheduleAtFixedRate(() -> {
             if (pacman.isAlive()){
@@ -83,13 +85,13 @@ public class CollisionTest {
             }
         }, 0, 100, TimeUnit.MILLISECONDS);
 
-        // This will fail if the task is interrupted.
+// This will fail if the task is interrupted.
         Assertions.assertThatCode(() -> {
             if (timer.awaitTermination(1, TimeUnit.SECONDS))
                 timer.shutdown();
             }).doesNotThrowAnyException();
 
-        // End of game should be caused by interaction with ghost.
+// End of game should be caused by interaction with ghost.
         Assertions.assertThat(pacman.getKiller()).isInstanceOf(Ghost.class);
     }
 

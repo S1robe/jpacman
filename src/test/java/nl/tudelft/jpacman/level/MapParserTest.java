@@ -40,25 +40,39 @@ public class MapParserTest {
         mp = null;
     }
 
+    //Load simple map, should load and throw no error
     @Test
     void testLoadSimpleMap() {
-        Assertions.assertThatCode(() -> mp.parseMap("/simplemap.txt")).doesNotThrowAnyException();
+        Assertions.assertThatCode(() -> mp.parseMap("/simplemap.txt"))
+            .doesNotThrowAnyException();
     }
 
+    //Empty maps are not allowd, should throw error
     @Test
     void testLoadEmptyMap(){
-        Assertions.assertThatThrownBy(() -> mp.parseMap("/emptyMap.txt")).isInstanceOf(PacmanConfigurationException.class);
+        Assertions.assertThatThrownBy(() -> mp.parseMap("/emptyMap.txt"))
+            .isInstanceOf(PacmanConfigurationException.class);
     }
 
+    //A different non-std map, should not error
     @Test
     void testLoadCertainDeathMap() {
-        Assertions.assertThatCode(() -> mp.parseMap("/certainDeathMap.txt")).doesNotThrowAnyException();
+        Assertions.assertThatCode(() -> mp.parseMap("/certainDeathMap.txt"))
+            .doesNotThrowAnyException();
     }
 
+    //Map doesnt exist, should error.
     @Test
     void testNonExistentMap(){
-        // Map doesnt exist
-        Assertions.assertThatThrownBy(() -> mp.parseMap("/IdontExistMap.txt")).isInstanceOf(PacmanConfigurationException.class);
+        Assertions.assertThatThrownBy(() -> mp.parseMap("/IdontExistMap.txt"))
+            .isInstanceOf(PacmanConfigurationException.class);
+    }
+
+    //Map doesnt have a player should not error.
+    @Test
+    void testMapMissingPlayer(){
+        Assertions.assertThatCode(() -> mp.parseMap("/missingPlayer.txt"))
+            .doesNotThrowAnyException();
     }
 }
 

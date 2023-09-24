@@ -49,15 +49,19 @@ public class PlayerTest {
         Player pacman = launcher.getGame().getPlayers().get(0);
         Square pacmanStartSpot = pacman.getSquare();
         launcher.getGame().getLevel().move(pacman, Direction.NORTH);
-        Assertions.assertThat(pacmanStartSpot).isEqualTo(pacman.getSquare()); // Never moved cause upward collision
+ // Never moved cause upward collision
+        Assertions.assertThat(pacmanStartSpot).isEqualTo(pacman.getSquare());
         launcher.getGame().getLevel().move(pacman, Direction.SOUTH);
-        Assertions.assertThat(pacmanStartSpot).isEqualTo(pacman.getSquare()); // Never moved cause downward collision
+ // Never moved cause downward collision
+        Assertions.assertThat(pacmanStartSpot).isEqualTo(pacman.getSquare());
 
         launcher.getGame().getLevel().move(pacman, Direction.EAST);
         launcher.getGame().getLevel().move(pacman, Direction.WEST);
-        Assertions.assertThat(pacmanStartSpot).isEqualTo(pacman.getSquare()); // mvoed right so left should be same
+ // mvoed right so left should be same
+        Assertions.assertThat(pacmanStartSpot).isEqualTo(pacman.getSquare());
         launcher.getGame().getLevel().move(pacman, Direction.WEST);
         launcher.getGame().getLevel().move(pacman, Direction.EAST);
-        Assertions.assertThat(pacmanStartSpot).isEqualTo(pacman.getSquare()); // moved right back to start spot should be same as start.
+ // moved right back to start spot should be same as start.
+        Assertions.assertThat(pacmanStartSpot).isEqualTo(pacman.getSquare());
     }
 }
